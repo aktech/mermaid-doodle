@@ -12,6 +12,11 @@ npm install mermaid-doodle mermaid
 Requires mermaid 11 or newer (peer dependency, `>=11`). The test suite
 develops and verifies against mermaid 11.17.2 specifically.
 
+This is browser JavaScript and needs no particular Node version to use, so
+the package declares no `engines`. Working on the package itself does need
+Node 22.18 or newer: `npm test` runs `node --test` straight over the
+TypeScript sources and relies on native type stripping.
+
 ## Use it
 
 Bundler or framework:

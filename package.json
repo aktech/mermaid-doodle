@@ -3,9 +3,26 @@
   "version": "0.1.0",
   "description": "Hand-drawn Mermaid diagrams for any static site, themed from CSS custom properties.",
   "license": "MIT",
+  "author": "Amit Kumar",
   "type": "module",
-  "engines": {
-    "node": ">=22.18"
+  "keywords": [
+    "mermaid",
+    "diagram",
+    "hand-drawn",
+    "css-custom-properties",
+    "dark-mode",
+    "static-site",
+    "hugo",
+    "astro",
+    "starlight"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aktech/mermaid-doodle.git"
+  },
+  "homepage": "https://github.com/aktech/mermaid-doodle#readme",
+  "bugs": {
+    "url": "https://github.com/aktech/mermaid-doodle/issues"
   },
   "files": [
     "dist"
@@ -21,8 +38,14 @@
       "types": "./dist/auto.d.ts",
       "import": "./dist/auto.js"
     },
+    "./auto.iife.js": "./dist/auto.iife.js",
     "./styles.css": "./dist/styles.css"
   },
+  "sideEffects": [
+    "**/*.css",
+    "./dist/auto.js",
+    "./dist/auto.iife.js"
+  ],
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
