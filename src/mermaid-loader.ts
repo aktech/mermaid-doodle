@@ -6,7 +6,7 @@ export interface MermaidLike {
 // Pinned to an exact version rather than a floating major: this URL is
 // remote executable code fetched at run time, and a floating major (e.g.
 // mermaid@11) resolves to whatever is newest whenever a browser hits it.
-export const DEFAULT_CDN_URL = 'https://cdn.jsdelivr.net/npm/mermaid@12.0.0/dist/mermaid.esm.min.mjs';
+export const DEFAULT_CDN_URL = 'https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.esm.min.mjs';
 
 function unwrap(mod: unknown): MermaidLike | null {
   const candidate = (mod as { default?: unknown })?.default ?? mod;
