@@ -27,11 +27,23 @@ export function buildSourceView(source: string, label = 'mermaid'): HTMLElement 
 
   let timer: ReturnType<typeof setTimeout> | undefined;
   copy.addEventListener('click', () => {
-    void navigator.clipboard.writeText(source).then(() => {
-      copy.classList.add('is-copied');
-      clearTimeout(timer);
-      timer = setTimeout(() => copy.classList.remove('is-copied'), COPIED_MS);
-    });
+    // navigator.clipboard is undefined in a non-secure context (plain HTTP
+    // on a non-localhost host), so guard it before dereferencing writeText -
+    // otherwise this throws synchronously and the button appears dead.
+    const clipboard = navigator.clipboard;
+    if (!clipboard || typeof clipboard.writeText !== 'function') return;
+
+    void clipboard
+      .writeText(source)
+      .then(() => {
+        copy.classList.add('is-copied');
+        clearTimeout(timer);
+        timer = setTimeout(() => copy.classList.remove('is-copied'), COPIED_MS);
+      })
+      .catch(() => {
+        // Write refused (denied permission, document not focused, etc).
+        // Stay quiet: no copied state, no error UI, nothing to surface.
+      });
   });
 
   head.append(lang, copy);
