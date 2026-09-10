@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8"><title>render oklch fixture</title>
+    <style>
+      :root {
+        --doodle-accent: oklch(55% 0.2 290);
+        --doodle-node-bg: oklch(92% 0.02 290);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="doodle-wrap">
+      <pre class="mermaid" id="d1">graph LR
+  A["start"] --> B["end"]</pre>
+    </div>
+    <script type="module">
+      import mermaid from '/node_modules/mermaid/dist/mermaid.esm.mjs';
+      import * as doodle from '/dist/index.js';
+      window.doodle = doodle;
+      window.renderer = doodle.createRenderer({ mermaid });
+      await window.renderer.mount();
+      window.ready = true;
+    </script>
+  </body>
+</html>

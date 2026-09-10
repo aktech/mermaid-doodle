@@ -15,3 +15,6 @@ export {
   toThemeVariables,
 } from './palette.ts';
 export type { DoodlePalette } from './palette.ts';
+export { normalisePaletteColours } from './colour.ts';
+export type { ColourConverter } from './colour.ts';
+export { createCanvasColourConverter } from './colour-canvas.ts';

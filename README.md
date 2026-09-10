@@ -61,7 +61,10 @@ Any of these markup shapes is picked up automatically:
 
 Colours come from CSS custom properties read off the page when a diagram
 renders. Set them per theme and the diagrams follow, with no JavaScript
-configuration:
+configuration. Any colour syntax the browser understands works, including
+`oklch()`, `lab()`, and `color-mix()`: values are normalised before Mermaid
+ever sees them, since Mermaid's own colour library only parses the legacy
+forms.
 
 ```css
 :root {

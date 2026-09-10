@@ -3,6 +3,8 @@ import { collectSources, DEFAULT_SELECTOR } from './sources.ts';
 import { buildSourceView } from './source-view.ts';
 import { watchTheme } from './theme.ts';
 import { resolveMermaid, DEFAULT_CDN_URL, type MermaidLike } from './mermaid-loader.ts';
+import { normalisePaletteColours, type ColourConverter } from './colour.ts';
+import { createCanvasColourConverter } from './colour-canvas.ts';
 
 export interface DoodleOptions {
   /** Where to look for diagrams. Defaults to the whole document. */
@@ -76,6 +78,7 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
   let instance: MermaidLike | null = null;
   let stopWatching: (() => void) | null = null;
   let fontsReady = false;
+  let colourConverter: ColourConverter | null = null;
 
   /**
    * Mermaid measures node-label widths against whatever font is active at
@@ -166,6 +169,15 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
 
     await ensureFontsReady(palette.font);
 
+    // Mermaid's own colour library cannot parse every colour syntax a site
+    // might write --doodle-* in (oklch(), lab(), color-mix(), ...), so run
+    // the colour fields through a converter first. The converter itself is
+    // created once and reused: it is stateless with respect to any single
+    // palette value, and recreating its backing canvas on every render
+    // would be wasted work.
+    colourConverter ??= createCanvasColourConverter();
+    const colours = normalisePaletteColours(palette, colourConverter);
+
     instance.initialize({
       startOnLoad: false,
       securityLevel,
@@ -173,7 +185,7 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
       handDrawnSeed,
       theme: 'base',
       fontFamily: palette.font,
-      themeVariables: toThemeVariables(palette),
+      themeVariables: toThemeVariables(colours),
       flowchart: { curve: 'basis', padding: 16, htmlLabels: true },
       ...mermaidConfig,
     });
