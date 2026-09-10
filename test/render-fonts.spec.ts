@@ -38,3 +38,28 @@ test('does not hang or throw when document.fonts is unavailable', async ({ page 
   await page.evaluate(() => (window as any).mountPromise);
   expect(await page.evaluate(() => (window as any).calls.length)).toBe(1);
 });
+
+test('requests the resolved --doodle-font family before the first render', async ({ page }) => {
+  await page.goto('/test/fixtures/render-fonts-load.html');
+  await page.waitForFunction(() => (window as any).ready === true);
+  await page.evaluate(() => (window as any).mountPromise);
+  const calls = await page.evaluate(() => (window as any).loadCalls);
+  expect(calls).toEqual(['1em "Test Doodle Font"']);
+});
+
+test('does not request a font load when the resolved font is a generic keyword', async ({ page }) => {
+  await page.goto('/test/fixtures/render-fonts-load-generic.html');
+  await page.waitForFunction(() => (window as any).ready === true);
+  await page.evaluate(() => (window as any).mountPromise);
+  const loadCalls = await page.evaluate(() => (window as any).loadCalls);
+  expect(loadCalls).toEqual([]);
+  // The generic keyword is not a reason to skip rendering, only loading.
+  expect(await page.evaluate(() => (window as any).calls.length)).toBe(1);
+});
+
+test('still renders when document.fonts.load throws', async ({ page }) => {
+  await page.goto('/test/fixtures/render-fonts-load-throws.html');
+  await page.waitForFunction(() => (window as any).ready === true);
+  await page.evaluate(() => (window as any).mountPromise);
+  expect(await page.evaluate(() => (window as any).calls.length)).toBe(1);
+});

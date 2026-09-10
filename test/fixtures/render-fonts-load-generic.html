@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en" data-theme="light">
-  <head><meta charset="utf-8"><title>render fonts fixture</title></head>
+  <head>
+    <meta charset="utf-8"><title>render fonts-load-generic fixture</title>
+    <style>:root { --doodle-font: sans-serif, "Some Other Font"; }</style>
+  </head>
   <body>
     <div class="doodle-wrap">
       <pre class="mermaid" id="d1">graph LR
@@ -9,16 +12,21 @@
     <script type="module">
       import * as doodle from '/dist/index.js';
 
-      let resolveFonts;
-      const fontsReady = new Promise((resolve) => { resolveFonts = resolve; });
-      Object.defineProperty(document, 'fonts', {
-        configurable: true,
-        value: { ready: fontsReady, load: () => Promise.resolve([]) },
-      });
-      window.resolveFonts = resolveFonts;
-
+      const loadCalls = [];
+      window.loadCalls = loadCalls;
       const calls = [];
       window.calls = calls;
+      Object.defineProperty(document, 'fonts', {
+        configurable: true,
+        value: {
+          ready: Promise.resolve(),
+          load(spec) {
+            loadCalls.push(spec);
+            return Promise.resolve([]);
+          },
+        },
+      });
+
       const mermaid = {
         initialize() {},
         run() { calls.push(Date.now()); },

@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en" data-theme="light">
-  <head><meta charset="utf-8"><title>render fonts fixture</title></head>
+  <head>
+    <meta charset="utf-8"><title>render fonts-load-throws fixture</title>
+    <style>:root { --doodle-font: "Test Doodle Font", cursive; }</style>
+  </head>
   <body>
     <div class="doodle-wrap">
       <pre class="mermaid" id="d1">graph LR
@@ -9,13 +12,18 @@
     <script type="module">
       import * as doodle from '/dist/index.js';
 
-      let resolveFonts;
-      const fontsReady = new Promise((resolve) => { resolveFonts = resolve; });
+      // document.fonts.load throws synchronously here, to prove a failing
+      // explicit font request still degrades to rendering rather than
+      // blocking it.
       Object.defineProperty(document, 'fonts', {
         configurable: true,
-        value: { ready: fontsReady, load: () => Promise.resolve([]) },
+        value: {
+          ready: Promise.resolve(),
+          load() {
+            throw new Error('boom');
+          },
+        },
       });
-      window.resolveFonts = resolveFonts;
 
       const calls = [];
       window.calls = calls;

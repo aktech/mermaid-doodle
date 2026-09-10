@@ -38,6 +38,28 @@ const SOURCE_ATTR = 'data-doodle-source';
 // happened to enumerate.
 const DIAGRAM_CLASS = 'doodle-diagram';
 
+// CSS Fonts Level 4 generic family keywords: none of these name an
+// installable webfont, so there is nothing for document.fonts.load to
+// usefully request.
+const GENERIC_FONT_FAMILIES = new Set([
+  'serif', 'sans-serif', 'cursive', 'fantasy', 'monospace',
+  'system-ui', 'ui-serif', 'ui-sans-serif', 'ui-monospace', 'ui-rounded',
+  'emoji', 'math', 'fangsong',
+]);
+
+/**
+ * The first family in a CSS font-family list (e.g. from --doodle-font),
+ * unquoted, or null if it is a generic keyword or the list is empty. Handles
+ * both a quoted family containing spaces (`"Shantell Sans", cursive`) and an
+ * unquoted one (`Arial, sans-serif`).
+ */
+function firstFontFamily(fontStack: string): string | null {
+  const first = (fontStack.split(',')[0] ?? '').trim();
+  const unquoted = first.replace(/^["']|["']$/g, '').trim();
+  if (!unquoted || GENERIC_FONT_FAMILIES.has(unquoted.toLowerCase())) return null;
+  return unquoted;
+}
+
 export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
   const {
     root = document,
@@ -57,22 +79,43 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
 
   /**
    * Mermaid measures node-label widths against whatever font is active at
-   * render time. On a first page load the webfont usually has not arrived
-   * yet, so labels get measured against the fallback font and end up
-   * truncated in the rendered SVG. Waiting for document.fonts.ready once,
-   * before the first render, avoids that race. document.fonts is absent in
-   * some environments, so this is guarded rather than assumed, and it only
-   * runs once: after fonts have loaded they stay loaded, so re-renders
-   * (theme switches in particular) should not pay this cost again.
+   * render time. document.fonts.ready alone does not guarantee the real
+   * font is that font: it resolves once loading finishes for fonts the
+   * document has already requested, and on a first render nothing has used
+   * the diagram's font family yet, so nothing has requested it, so
+   * document.fonts.ready resolves immediately against the fallback font,
+   * and the real font only arrives (and reflows label boxes sized for the
+   * wrong metrics) afterwards. Explicitly requesting the resolved family
+   * with document.fonts.load before waiting on document.fonts.ready is what
+   * actually forces the browser to fetch it first.
+   *
+   * document.fonts is absent in some environments and a font request can
+   * fail or throw, so both steps are guarded; a missing or failing font
+   * falls back to whatever is available today rather than blocking or
+   * breaking rendering. This runs once: after fonts have loaded they stay
+   * loaded, so re-renders (theme switches in particular) should not pay
+   * this cost again.
    */
-  async function ensureFontsReady(): Promise<void> {
+  async function ensureFontsReady(fontStack: string): Promise<void> {
     if (fontsReady) return;
     fontsReady = true;
     if (typeof document === 'undefined' || !document.fonts) return;
+
+    const family = firstFontFamily(fontStack);
+    if (family) {
+      try {
+        await document.fonts.load(`1em "${family}"`);
+      } catch {
+        // A failed explicit request falls back to whatever is available;
+        // the ready wait below still runs in case something else is
+        // already in flight.
+      }
+    }
+
     try {
       await document.fonts.ready;
     } catch {
-      // Never let a font-loading failure block rendering.
+      // Never let this block rendering.
     }
   }
 
@@ -93,8 +136,6 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
       console.warn('[mermaid-doodle] no mermaid instance available, diagrams left as text');
       return;
     }
-
-    await ensureFontsReady();
 
     const found = collectSources(root, selector);
     if (found.length === 0) return;
@@ -122,6 +163,8 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
     const palette = paletteFromVars((name) =>
       getComputedStyle(document.documentElement).getPropertyValue(name),
     );
+
+    await ensureFontsReady(palette.font);
 
     instance.initialize({
       startOnLoad: false,
