@@ -84,6 +84,8 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
   const collectSelector = `${selector}, ${CLAIMED_SELECTOR}`;
 
   let instance: MermaidLike | null = null;
+  let inFlight: Promise<void> | null = null;
+  let rerunRequested = false;
   let stopWatching: (() => void) | null = null;
   let fontsReady = false;
   let colourConverter: ColourConverter | null = null;
@@ -141,7 +143,7 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
     return wrapper;
   }
 
-  async function render(): Promise<void> {
+  async function renderOnce(): Promise<void> {
     // Look for work before resolving mermaid, never the other way round.
     // Resolving first means every page of a site pays for mermaid (a ~3 MB
     // dynamic import, or a CDN fetch) even when it has no diagram on it at
@@ -204,6 +206,38 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
     });
 
     await instance.run({ nodes, suppressErrors: true });
+  }
+
+  /**
+   * One render at a time, last request wins.
+   *
+   * Left to overlap, two theme changes in quick succession start two renders
+   * over the same containers, and whichever finishes last writes the diagram,
+   * regardless of which theme was asked for last. A slow first render then
+   * strands the diagram in the palette the page is no longer showing. A
+   * request that arrives mid-render is remembered here and replayed once the
+   * current one is done, which both keeps the last requested theme the one
+   * that gets drawn and caps the work at one extra render however many
+   * changes arrive while a render is running.
+   */
+  function render(): Promise<void> {
+    if (inFlight) {
+      rerunRequested = true;
+      return inFlight;
+    }
+
+    inFlight = (async () => {
+      try {
+        do {
+          rerunRequested = false;
+          await renderOnce();
+        } while (rerunRequested);
+      } finally {
+        inFlight = null;
+      }
+    })();
+
+    return inFlight;
   }
 
   return {
