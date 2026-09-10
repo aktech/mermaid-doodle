@@ -19,6 +19,23 @@
     <pre id="prism"><code class="language-mermaid">graph LR
   A --&gt; B</code></pre>
 
+    <!-- 5. Expressive Code with a blank interior line. EC still emits no -->
+    <!-- newline text nodes between ec-line divs, but a blank line's own -->
+    <!-- .code div holds a literal "\n" (render-line.ts). The line below is -->
+    <!-- deliberately flush-left with no indentation so it contributes -->
+    <!-- exactly one newline character and nothing else. -->
+    <pre data-language="mermaid" id="ec-blank"><code><div class="ec-line"><div class="code"><span>graph LR</span></div></div><div class="ec-line"><div class="code"><span>  A --&gt; B</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span>  C --&gt; D</span></div></div></code></pre>
+
+    <!-- 6. Expressive Code with a line-number gutter. div.gutter sits before -->
+    <!-- div.code inside each ec-line; its text must not leak into the source -->
+    <pre data-language="mermaid" id="ec-gutter"><code><div class="ec-line"><div class="gutter"><span class="ln">1</span></div><div class="code"><span>graph LR</span></div></div><div class="ec-line"><div class="gutter"><span class="ln">2</span></div><div class="code"><span>  A --&gt; B</span></div></div></code></pre>
+
+    <!-- 7. An element that matches two selector clauses at once: pre.mermaid -->
+    <!-- and code.language-mermaid on the same fence must dedupe to one entry -->
+    <pre class="mermaid" id="prism-dual"><code class="language-mermaid">graph LR
+  A --&gt; B</code></pre>
+
     <script type="module">
       import * as doodle from '/dist/index.js';
       window.doodle = doodle;

@@ -18,22 +18,46 @@ const STASH = 'doodleSrc';
  * Read the diagram text out of a node that may be plain text or highlighted
  * markup.
  *
- * textContent is right for plain fences and for Shiki's classic structure,
- * which puts a real newline text node between lines. Expressive Code does
- * not: it emits one div.ec-line per line and only inserts a newline for
- * empty lines, so textContent returns the whole diagram on one line. When
- * the text has no newline but the node has more than one line element, the
- * source is rebuilt from those.
+ * The decision keys off whether the node has more than one structural line
+ * element (.ec-line or .line), not off whether textContent happens to
+ * contain a newline. Gating on textContent is wrong: Expressive Code inserts
+ * a real newline text node for an EMPTY line only (render-line.ts), so a
+ * diagram with a blank line in the middle already has one newline in
+ * textContent even though its non-blank lines are still glued together with
+ * no separator at all. Reconstructing from the line elements themselves
+ * handles that correctly, and also handles Shiki's classic structure (which
+ * has no gutter and no blank-line quirk) the same way, so there is one path
+ * for every highlighter that emits per-line markup.
+ *
+ * textContent is used directly only when there is no such per-line
+ * structure: a single-line diagram, or plain unhighlighted markup.
  */
 export function extractSource(el: Element): string {
-  const text = el.textContent ?? '';
-  if (!text.includes('\n')) {
-    const lines = el.querySelectorAll('.ec-line, .line');
-    if (lines.length > 1) {
-      return Array.from(lines, (line) => line.textContent ?? '').join('\n').replace(/\s+$/, '');
-    }
+  const lines = el.querySelectorAll('.ec-line, .line');
+  if (lines.length > 1) {
+    return Array.from(lines, lineText).join('\n').replace(/\s+$/, '');
   }
-  return text.replace(/\s+$/, '');
+  return (el.textContent ?? '').replace(/\s+$/, '');
+}
+
+/**
+ * Text of a single line element.
+ *
+ * Expressive Code puts an optional line-number gutter (div.gutter) before
+ * the code (div.code) as a sibling inside the same line element, so prefer
+ * the .code child when there is one rather than reading the whole line,
+ * which would scrape the gutter digits into the source. Shiki's .line spans
+ * have no such child, so they fall back to the line's own text.
+ *
+ * A blank line's .code div holds a literal "\n" (Expressive Code's own
+ * stand-in for empty content), which is stripped here: a single line can
+ * never legitimately contain a newline, and the join in extractSource is
+ * what puts the line break back between lines.
+ */
+function lineText(line: Element): string {
+  const code = line.querySelector(':scope > .code');
+  const text = (code ?? line).textContent ?? '';
+  return text.replace(/\n/g, '');
 }
 
 function containerFor(el: Element): HTMLElement | null {
