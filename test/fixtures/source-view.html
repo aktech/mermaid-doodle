@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head><meta charset="utf-8"><title>source view fixture</title></head>
+  <body>
+    <div id="host"></div>
+    <script type="module">
+      import * as doodle from '/dist/index.js';
+      document.getElementById('host').append(
+        doodle.buildSourceView('graph LR\n  A --> B'),
+      );
+      window.ready = true;
+    </script>
+  </body>
+</html>
