@@ -25,5 +25,8 @@
     "typescript": "7.0.2",
     "tsup": "8.5.1",
     "@types/node": "26.5.0"
+  },
+  "overrides": {
+    "esbuild": "0.28.2"
   }
 }

@@ -44,3 +44,10 @@ test('does not highlight inside markup it already injected', () => {
   );
   assert.equal(out.match(/doodle-hl-k/g)?.length, 2);
 });
+
+test('still highlights note and over outside a comment', () => {
+  assert.equal(
+    highlight('note over Alice: hi'),
+    '<span class="doodle-hl-k">note</span> <span class="doodle-hl-k">over</span> Alice: hi',
+  );
+});
