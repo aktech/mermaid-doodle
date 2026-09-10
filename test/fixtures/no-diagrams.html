@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head><meta charset="utf-8"><title>no diagrams fixture</title></head>
+  <body>
+    <p>A page with no diagram of any of the four markup shapes.</p>
+    <!-- A code block in another language must not count as work to do. -->
+    <pre><code class="language-js">const x = 1;</code></pre>
+    <script type="module">
+      import * as doodle from '/dist/index.js';
+      // Default cdnUrl on purpose: this is the configuration a consumer gets
+      // when they mount without gating on the page having any diagram.
+      window.renderer = doodle.createRenderer();
+      await window.renderer.mount();
+      window.ready = true;
+    </script>
+  </body>
+</html>

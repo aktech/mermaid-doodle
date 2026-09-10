@@ -142,14 +142,19 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
   }
 
   async function render(): Promise<void> {
+    // Look for work before resolving mermaid, never the other way round.
+    // Resolving first means every page of a site pays for mermaid (a ~3 MB
+    // dynamic import, or a CDN fetch) even when it has no diagram on it at
+    // all, which leaves consumers writing their own presence gates just to
+    // avoid the download.
+    const found = collectSources(root, collectSelector);
+    if (found.length === 0) return;
+
     instance ??= await resolveMermaid(provided, cdnUrl);
     if (!instance) {
       console.warn('[mermaid-doodle] no mermaid instance available, diagrams left as text');
       return;
     }
-
-    const found = collectSources(root, collectSelector);
-    if (found.length === 0) return;
 
     const nodes: HTMLElement[] = [];
 
