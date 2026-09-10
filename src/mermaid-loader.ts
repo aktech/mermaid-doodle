@@ -16,6 +16,20 @@ function unwrap(mod: unknown): MermaidLike | null {
 }
 
 /**
+ * A literal `import(specifier)` is visible to esbuild at build time. That is
+ * harmless for the ESM output (mermaid stays external, as configured), but
+ * the IIFE build has no module resolver in a plain browser page, and rather
+ * than leave an unresolvable bare specifier behind, esbuild bundles the
+ * whole dependency into the IIFE instead. Routing the call through
+ * `new Function` keeps the specifier a runtime-only string no bundler can
+ * see or inline, so this stays a genuine dynamic import in every output
+ * format.
+ */
+const dynamicImport = new Function('specifier', 'return import(specifier)') as (
+  specifier: string,
+) => Promise<unknown>;
+
+/**
  * Resolve a mermaid instance without bundling one.
  *
  * Order: an instance the caller passed in, a global the page already loaded
@@ -33,14 +47,14 @@ export async function resolveMermaid(
   if (global) return global;
 
   try {
-    return unwrap(await import('mermaid'));
+    return unwrap(await dynamicImport('mermaid'));
   } catch {
     // No bare specifier resolution here (IIFE build in a plain page).
   }
 
   if (cdnUrl) {
     try {
-      return unwrap(await import(/* @vite-ignore */ cdnUrl));
+      return unwrap(await dynamicImport(cdnUrl));
     } catch {
       // Fall through to null: the caller reports rather than throwing.
     }

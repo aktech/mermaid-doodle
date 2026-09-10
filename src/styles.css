@@ -1,0 +1,34 @@
+.doodle-wrap { margin: 1.75rem 0; text-align: center; overflow-x: auto; }
+.doodle-wrap pre.mermaid,
+.doodle-wrap pre[data-language="mermaid"] {
+  background: none; border: 0; margin: 0 auto; padding: 0;
+  font-family: inherit; line-height: normal;
+}
+.doodle-wrap pre.mermaid:not([data-processed]) { visibility: hidden; min-height: 2rem; }
+
+.doodle-source {
+  text-align: left; margin: 0 0 1rem; border: 1px solid #d4d4d8;
+  border-radius: 8px; overflow: hidden; background: #fafafa;
+}
+.doodle-source__head {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .4rem .75rem; border-bottom: 1px solid #d4d4d8; font-size: .78rem;
+}
+.doodle-source__lang { margin-left: auto; font-family: ui-monospace, monospace; font-size: .72rem; opacity: .7; }
+.doodle-source__pre {
+  margin: 0; padding: .9rem 1rem; overflow-x: auto;
+  font-family: ui-monospace, monospace; font-size: .85rem; line-height: 1.6;
+}
+.doodle-hl-k { color: #7c3aed; }
+.doodle-hl-s { color: #15803d; }
+.doodle-hl-c { color: #71717a; font-style: italic; }
+.doodle-hl-o { color: #0369a1; }
+
+.doodle-copy {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: none; border: 1px solid #d4d4d8; color: inherit;
+  border-radius: 6px; padding: .25rem; cursor: pointer;
+}
+.doodle-copy__check { display: none; }
+.doodle-copy.is-copied .doodle-copy__copy { display: none; }
+.doodle-copy.is-copied .doodle-copy__check { display: inline; }
