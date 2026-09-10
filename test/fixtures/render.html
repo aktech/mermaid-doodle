@@ -13,9 +13,15 @@
   A["start"] --> B["end"]</pre>
     </div>
     <!-- Starlight/Astro Expressive Code shape: no .mermaid class, no
-         pre-existing .doodle-wrap ancestor, unlike Darby's d1 above. -->
+         pre-existing .doodle-wrap ancestor, unlike the pre.mermaid d1 above. -->
     <pre data-language="mermaid" id="d2">graph LR
   C["start"] --> D["end"]</pre>
+    <!-- Prism / Rouge / highlight.js shape. The selector matches the <code>
+         child, but the container is its parent <pre>, and the first render
+         replaces that child with the diagram, so nothing about this <pre>
+         matches DEFAULT_SELECTOR any more once it has been rendered once. -->
+    <pre id="d3"><code class="language-mermaid">graph LR
+  E["start"] --&gt; F["end"]</code></pre>
     <script type="module">
       import mermaid from '/node_modules/mermaid/dist/mermaid.esm.mjs';
       import * as doodle from '/dist/index.js';

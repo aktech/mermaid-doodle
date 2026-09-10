@@ -1,10 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-const strokeOf = async (page: import('@playwright/test').Page) =>
-  page.evaluate(() => {
-    const edge = document.querySelector('#d1 svg .flowchart-link, #d1 svg path');
+const strokeOf = async (page: import('@playwright/test').Page, id = 'd1') =>
+  page.evaluate((target) => {
+    const edge = document.querySelector(
+      `#${target} svg .flowchart-link, #${target} svg path`,
+    );
     return edge ? getComputedStyle(edge).stroke : null;
-  });
+  }, id);
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/test/fixtures/render.html');
@@ -32,6 +34,18 @@ test('re-renders with the new palette when the theme changes', async ({ page }) 
   await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
   await expect.poll(() => strokeOf(page)).not.toBe(light);
   await expect(page.locator('#d1 svg')).toHaveCount(1);
+});
+
+test('re-renders a code.language-mermaid diagram when the theme changes', async ({ page }) => {
+  // Rendering d3 destroys the <code class="language-mermaid"> child that was
+  // the only part of it matching DEFAULT_SELECTOR, so a renderer that
+  // re-collects with the plain selector never sees it again and leaves it
+  // stuck in the first theme's palette forever.
+  await expect(page.locator('#d3 svg')).toBeVisible();
+  const light = await strokeOf(page, 'd3');
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+  await expect.poll(() => strokeOf(page, 'd3')).not.toBe(light);
+  await expect(page.locator('#d3 svg')).toHaveCount(1);
 });
 
 test('does not duplicate the source panel across re-renders', async ({ page }) => {

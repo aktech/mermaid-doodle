@@ -1,5 +1,5 @@
 import { paletteFromVars, toThemeVariables } from './palette.ts';
-import { collectSources, DEFAULT_SELECTOR } from './sources.ts';
+import { collectSources, CLAIMED_SELECTOR, DEFAULT_SELECTOR } from './sources.ts';
 import { buildSourceView } from './source-view.ts';
 import { watchTheme } from './theme.ts';
 import { resolveMermaid, DEFAULT_CDN_URL, type MermaidLike } from './mermaid-loader.ts';
@@ -75,6 +75,14 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
     mermaidConfig = {},
   } = options;
 
+  // Every render collects with the markup shapes AND with "already claimed",
+  // because rendering can remove the very thing that made a container match a
+  // markup shape: for code.language-mermaid the container is the parent <pre>
+  // and rendering replaces the <code class="language-mermaid"> child. Without
+  // the second clause that container is invisible from the second render on,
+  // so it silently keeps the first theme's palette forever.
+  const collectSelector = `${selector}, ${CLAIMED_SELECTOR}`;
+
   let instance: MermaidLike | null = null;
   let stopWatching: (() => void) | null = null;
   let fontsReady = false;
@@ -140,7 +148,7 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
       return;
     }
 
-    const found = collectSources(root, selector);
+    const found = collectSources(root, collectSelector);
     if (found.length === 0) return;
 
     const nodes: HTMLElement[] = [];
