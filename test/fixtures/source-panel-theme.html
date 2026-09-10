@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8"><title>source panel theming fixture</title>
+    <link rel="stylesheet" href="/dist/styles.css">
+    <!-- An ordinary dark site: light body text on a dark ground. -->
+    <style>body { background: #111114; color: #f4f4f5; }</style>
+  </head>
+  <body>
+    <div id="host"></div>
+    <script type="module">
+      import * as doodle from '/dist/index.js';
+      document.getElementById('host').append(
+        doodle.buildSourceView('graph LR\n  A --> B'),
+      );
+      window.ready = true;
+    </script>
+  </body>
+</html>

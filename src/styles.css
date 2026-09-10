@@ -42,27 +42,44 @@ div.mermaid:not([data-processed]) {
 }
 .doodle-diagram:not([data-processed]) { visibility: hidden; min-height: 2rem; }
 
+/*
+ * Source panel.
+ *
+ * The panel paints its own background, so it must paint its own text colour
+ * as well. Leaving the text to inherit meant every dark site got the page's
+ * light body text on this near-white panel, which is unreadable.
+ *
+ * Every colour here reads a --doodle-source-* custom property with the value
+ * this shipped with as its fallback, so a site can retint the panel without
+ * having to restate the whole block. The diagram palette (--doodle-*) is
+ * deliberately separate: it feeds Mermaid, this feeds the panel around it.
+ */
 .doodle-source {
-  text-align: left; margin: 0 0 1rem; border: 1px solid #d4d4d8;
-  border-radius: 8px; overflow: hidden; background: #fafafa;
+  text-align: left; margin: 0 0 1rem;
+  border: 1px solid var(--doodle-source-border, #d4d4d8);
+  border-radius: 8px; overflow: hidden;
+  background: var(--doodle-source-bg, #fafafa);
+  color: var(--doodle-source-text, #27272a);
 }
 .doodle-source__head {
   display: flex; align-items: center; gap: .5rem;
-  padding: .4rem .75rem; border-bottom: 1px solid #d4d4d8; font-size: .78rem;
+  padding: .4rem .75rem; font-size: .78rem;
+  border-bottom: 1px solid var(--doodle-source-border, #d4d4d8);
 }
 .doodle-source__lang { margin-left: auto; font-family: ui-monospace, monospace; font-size: .72rem; opacity: .7; }
 .doodle-source__pre {
   margin: 0; padding: .9rem 1rem; overflow-x: auto;
   font-family: ui-monospace, monospace; font-size: .85rem; line-height: 1.6;
 }
-.doodle-hl-k { color: #7c3aed; }
-.doodle-hl-s { color: #15803d; }
-.doodle-hl-c { color: #71717a; font-style: italic; }
-.doodle-hl-o { color: #0369a1; }
+.doodle-hl-k { color: var(--doodle-source-keyword, #7c3aed); }
+.doodle-hl-s { color: var(--doodle-source-string, #15803d); }
+.doodle-hl-c { color: var(--doodle-source-comment, #71717a); font-style: italic; }
+.doodle-hl-o { color: var(--doodle-source-operator, #0369a1); }
 
 .doodle-copy {
   display: inline-flex; align-items: center; justify-content: center;
-  background: none; border: 1px solid #d4d4d8; color: inherit;
+  background: none; color: inherit;
+  border: 1px solid var(--doodle-source-border, #d4d4d8);
   border-radius: 6px; padding: .25rem; cursor: pointer;
 }
 .doodle-copy__check { display: none; }
