@@ -5,7 +5,7 @@ export interface DiagramSource {
 
 /**
  * Markup shapes that carry a mermaid fence:
- *   pre.mermaid / div.mermaid   Hugo, Darby, mermaid's own convention
+ *   pre.mermaid / div.mermaid   Hugo, and mermaid's own convention
  *   [data-language="mermaid"]   Astro Shiki and Expressive Code
  *   code.language-mermaid       Prism, Rouge, highlight.js
  */

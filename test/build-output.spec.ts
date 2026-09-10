@@ -38,7 +38,8 @@ test('no JS artifact in dist bundles mermaid, whatever build config produced it'
   // false for a new browser-shaped entry. tsc can't catch a missing
   // `define`, and the two tests above only ever look at auto.iife.js by
   // name, so a differently-named config that forgets it would reproduce
-  // the exact silent 7.57 MB bundling defect this task already hit, with
+  // the exact silent 7.57 MB bundling defect an earlier build
+  // configuration produced here, with
   // nothing here to catch it. This scans every JS file dist/ actually
   // holds instead of a hardcoded filename.
   //

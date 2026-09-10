@@ -36,7 +36,7 @@ const SOURCE_ATTR = 'data-doodle-source';
 // mermaid marks it data-processed. Applied to every container regardless of
 // which of the four DEFAULT_SELECTOR shapes it came in as, so the hide
 // works the same way for a Starlight [data-language="mermaid"] block as for
-// a Darby pre.mermaid one, instead of covering only the shape src/styles.css
+// a Hugo pre.mermaid one, instead of covering only the shape src/styles.css
 // happened to enumerate.
 const DIAGRAM_CLASS = 'doodle-diagram';
 
