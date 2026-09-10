@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head><meta charset="utf-8"><title>theme fixture</title></head>
+  <body>
+    <script type="module">
+      import * as doodle from '/dist/index.js';
+      window.doodle = doodle;
+      window.themeEvents = [];
+      window.stopWatching = doodle.watchTheme((t) => window.themeEvents.push(t));
+      window.ready = true;
+    </script>
+  </body>
+</html>

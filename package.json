@@ -4,13 +4,23 @@
   "description": "Hand-drawn Mermaid diagrams for any static site, themed from CSS custom properties.",
   "license": "MIT",
   "type": "module",
-  "engines": { "node": ">=22.18" },
-  "files": ["dist"],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "files": [
+    "dist"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./auto": { "types": "./dist/auto.d.ts", "import": "./dist/auto.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./auto": {
+      "types": "./dist/auto.d.ts",
+      "import": "./dist/auto.js"
+    },
     "./styles.css": "./dist/styles.css"
   },
   "scripts": {
@@ -19,12 +29,19 @@
     "test": "node --test 'src/**/*.test.ts'",
     "test:dom": "playwright test"
   },
-  "peerDependencies": { "mermaid": ">=11" },
-  "peerDependenciesMeta": { "mermaid": { "optional": true } },
+  "peerDependencies": {
+    "mermaid": ">=11"
+  },
+  "peerDependenciesMeta": {
+    "mermaid": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "typescript": "7.0.2",
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.5.0",
     "tsup": "8.5.1",
-    "@types/node": "26.5.0"
+    "typescript": "5.9.3"
   },
   "overrides": {
     "esbuild": "0.28.2"
