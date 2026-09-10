@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8"><title>failing render fixture</title>
+    <style>
+      :root { --doodle-accent: #5b3cc4; }
+      [data-theme="dark"] { --doodle-accent: #8b5cf6; }
+    </style>
+  </head>
+  <body>
+    <pre class="mermaid" id="d1">graph LR
+  A --> B</pre>
+    <script type="module">
+      import * as doodle from '/dist/index.js';
+
+      // Fails the second render only: the mount render works, so the page
+      // looks fine, and the failure only shows up on a theme change. Both
+      // consumers call mount() without awaiting it, so nothing downstream is
+      // watching the promise this rejection would otherwise travel on.
+      let call = 0;
+      const mermaid = {
+        initialize(next) { window.lastConfig = next; },
+        async run({ nodes }) {
+          if (call++ === 1) throw new Error('render blew up');
+          for (const node of nodes) {
+            node.textContent = window.lastConfig.themeVariables.lineColor;
+            node.setAttribute('data-processed', 'true');
+          }
+        },
+      };
+
+      window.renderer = doodle.createRenderer({ mermaid, cdnUrl: null });
+      await window.renderer.mount();
+      window.ready = true;
+    </script>
+  </body>
+</html>

@@ -178,9 +178,11 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
       nodes.push(container);
     }
 
-    const palette = paletteFromVars((name) =>
-      getComputedStyle(document.documentElement).getPropertyValue(name),
-    );
+    // One getComputedStyle for the whole palette, not one per field. The
+    // declaration it returns is live, so every read below still sees the
+    // current values.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const palette = paletteFromVars((name) => rootStyle.getPropertyValue(name));
 
     await ensureFontsReady(palette.font);
 
@@ -230,7 +232,17 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
       try {
         do {
           rerunRequested = false;
-          await renderOnce();
+          try {
+            await renderOnce();
+          } catch (error) {
+            // mount() is routinely called without awaiting it, and theme
+            // changes call render() with nothing holding the promise at all,
+            // so an error here has nowhere to surface: the page just quietly
+            // stops drawing diagrams. Report it in the same shape as the
+            // missing-instance warning above and carry on, so a queued
+            // re-render still happens and the next theme change still works.
+            console.warn('[mermaid-doodle] render failed', error);
+          }
         } while (rerunRequested);
       } finally {
         inFlight = null;
