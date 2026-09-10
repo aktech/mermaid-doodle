@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8"><title>CSP fixture</title>
+    <!-- No 'unsafe-eval'. This is an ordinary policy for a static site, and
+         it makes the Function constructor throw. The page supplies mermaid
+         itself and refuses the CDN, so nothing here should ever need it. -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
+    <style>:root { --doodle-accent: #5b3cc4; }</style>
+  </head>
+  <body>
+    <pre class="mermaid" id="d1">graph LR
+  A --> B</pre>
+    <script type="module">
+      import * as doodle from '/dist/index.js';
+      const mermaid = {
+        initialize() {},
+        run({ nodes }) {
+          for (const node of nodes) {
+            node.textContent = 'RENDERED';
+            node.setAttribute('data-processed', 'true');
+          }
+        },
+      };
+      window.renderer = doodle.createRenderer({ mermaid, cdnUrl: null });
+      await window.renderer.mount();
+      window.ready = true;
+    </script>
+  </body>
+</html>

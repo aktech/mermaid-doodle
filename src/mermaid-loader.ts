@@ -33,20 +33,34 @@ function unwrap(mod: unknown): MermaidLike | null {
 declare const __DOODLE_BARE_IMPORT__: boolean;
 
 /**
+ * Import a module named by a specifier that is only known at run time.
+ *
  * The CDN URL is a runtime string, never a literal, so no bundler can
  * resolve it at build time regardless of format. Routing it through
  * `new Function` keeps it that way defensively and stops any bundler from
  * even attempting static analysis on it.
+ *
+ * The helper is built here, on demand, and never at module scope. The
+ * Function constructor is refused by any Content Security Policy whose
+ * script-src lacks 'unsafe-eval', which is an ordinary policy for a static
+ * site. At module scope that refusal throws while the bundle is still
+ * evaluating, so the entire package fails to load and nothing renders at
+ * all, including for a consumer who supplied mermaid directly and refused
+ * the CDN with cdnUrl: null. Only the CDN branch calls this, so a page that
+ * never reaches that branch never touches the Function constructor.
  */
-const dynamicImport = new Function('specifier', 'return import(specifier)') as (
-  specifier: string,
-) => Promise<unknown>;
+function importAtRuntime(specifier: string): Promise<unknown> {
+  const dynamicImport = new Function('specifier', 'return import(specifier)') as (
+    specifier: string,
+  ) => Promise<unknown>;
+  return dynamicImport(specifier);
+}
 
 /**
  * Resolve a mermaid instance without bundling one.
  *
  * Order: an instance the caller passed in, a global the page already loaded
- * (Darby vendors mermaid and loads it first, so it never goes further than
+ * (a site that vendors mermaid and loads it first never goes further than
  * this), a bare import for bundler consumers (ESM build only, see
  * __DOODLE_BARE_IMPORT__ above), and only then a CDN URL for plain
  * script-tag pages that have no module resolution at all.
@@ -70,7 +84,10 @@ export async function resolveMermaid(
 
   if (cdnUrl) {
     try {
-      return unwrap(await dynamicImport(cdnUrl));
+      // Both building the helper and running the import are inside this
+      // guard, so a policy that refuses the Function constructor costs this
+      // one fallback and nothing else.
+      return unwrap(await importAtRuntime(cdnUrl));
     } catch {
       // Fall through to null: the caller reports rather than throwing.
     }
