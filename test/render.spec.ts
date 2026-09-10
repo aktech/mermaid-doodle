@@ -16,6 +16,12 @@ test('renders the diagram as inline SVG', async ({ page }) => {
   await expect(page.locator('#d1 svg')).toContainText('start');
 });
 
+test('marks a container found via [data-language="mermaid"] with the anti-flash class, not just pre.mermaid', async ({ page }) => {
+  await expect(page.locator('#d2')).toHaveClass(/doodle-diagram/);
+  await expect(page.locator('#d1')).toHaveClass(/doodle-diagram/);
+  await expect(page.locator('#d2 svg')).toBeVisible();
+});
+
 test('renders the source panel when the wrapper opts in', async ({ page }) => {
   await expect(page.locator('.doodle-source')).toHaveCount(1);
   await expect(page.locator('.doodle-source__pre')).toContainText('graph LR');

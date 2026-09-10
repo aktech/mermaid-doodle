@@ -30,6 +30,13 @@ export interface DoodleRenderer {
 
 const WRAP_CLASS = 'doodle-wrap';
 const SOURCE_ATTR = 'data-doodle-source';
+// Anti-flash hook: styles.css hides any element carrying this class until
+// mermaid marks it data-processed. Applied to every container regardless of
+// which of the four DEFAULT_SELECTOR shapes it came in as, so the hide
+// works the same way for a Starlight [data-language="mermaid"] block as for
+// a Darby pre.mermaid one, instead of covering only the shape src/styles.css
+// happened to enumerate.
+const DIAGRAM_CLASS = 'doodle-diagram';
 
 export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
   const {
@@ -95,6 +102,9 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
     const nodes: HTMLElement[] = [];
 
     for (const { container, source } of found) {
+      // classList.add is a no-op if the class is already there, so this
+      // stays correct across re-renders without any extra bookkeeping.
+      container.classList.add(DIAGRAM_CLASS);
       const wrapper = wrap(container);
 
       const wants = showSource || wrapper.hasAttribute(SOURCE_ATTR) || container.hasAttribute(SOURCE_ATTR);

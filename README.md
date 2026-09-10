@@ -9,7 +9,8 @@ properties. Works with Hugo, Astro, Jekyll, MkDocs, or a plain HTML page.
 npm install mermaid-doodle mermaid
 ```
 
-Requires mermaid 11 or newer (peer dependency, `>=11`).
+Requires mermaid 11 or newer (peer dependency, `>=11`). The test suite
+develops and verifies against mermaid 11.17.2 specifically.
 
 ## Use it
 
@@ -30,11 +31,31 @@ Plain page, with mermaid already loaded:
 <script src="/js/mermaid-doodle/auto.iife.js" defer></script>
 ```
 
+This build takes no imports, so it reads options off
+`window.mermaidDoodleConfig` instead of a `createRenderer()` call. Set it
+before the deferred scripts run so it is there by the time `auto.iife.js`
+mounts:
+
+```html
+<script>
+  window.mermaidDoodleConfig = {
+    showSource: true,
+    cdnUrl: null, // this page vendors mermaid itself; never fetch a CDN copy
+  };
+</script>
+<link rel="stylesheet" href="/js/mermaid-doodle/styles.css">
+<script src="/js/mermaid.min.js" defer></script>
+<script src="/js/mermaid-doodle/auto.iife.js" defer></script>
+```
+
+`window.mermaidDoodleConfig` accepts the same options as `createRenderer()`,
+listed under Options below.
+
 Any of these markup shapes is picked up automatically:
 
 - `pre.mermaid` and `div.mermaid`
 - `[data-language="mermaid"]` (Astro Shiki, Expressive Code, Starlight)
-- `pre > code.language-mermaid` (Prism, Rouge, highlight.js)
+- `code.language-mermaid`, resolved to its parent `<pre>` (Prism, Rouge, highlight.js)
 
 ## Theming
 
