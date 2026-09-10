@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8"><title>render fixture</title>
+    <style>
+      :root { --doodle-accent: #5b3cc4; --doodle-node-bg: #ece7f8; }
+      [data-theme="dark"] { --doodle-accent: #8b5cf6; --doodle-node-bg: #1c1633; }
+    </style>
+  </head>
+  <body>
+    <div class="doodle-wrap" data-doodle-source>
+      <pre class="mermaid" id="d1">graph LR
+  A["start"] --> B["end"]</pre>
+    </div>
+    <script type="module">
+      import mermaid from '/node_modules/mermaid/dist/mermaid.esm.mjs';
+      import * as doodle from '/dist/index.js';
+      window.doodle = doodle;
+      window.renderer = doodle.createRenderer({ mermaid });
+      await window.renderer.mount();
+      window.ready = true;
+    </script>
+  </body>
+</html>

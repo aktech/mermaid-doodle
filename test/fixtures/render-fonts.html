@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head><meta charset="utf-8"><title>render fonts fixture</title></head>
+  <body>
+    <div class="doodle-wrap">
+      <pre class="mermaid" id="d1">graph LR
+  A["start"] --> B["end"]</pre>
+    </div>
+    <script type="module">
+      import * as doodle from '/dist/index.js';
+
+      let resolveFonts;
+      const fontsReady = new Promise((resolve) => { resolveFonts = resolve; });
+      Object.defineProperty(document, 'fonts', {
+        configurable: true,
+        value: { ready: fontsReady },
+      });
+      window.resolveFonts = resolveFonts;
+
+      const calls = [];
+      window.calls = calls;
+      const mermaid = {
+        initialize() {},
+        run() { calls.push(Date.now()); },
+      };
+
+      window.doodle = doodle;
+      window.renderer = doodle.createRenderer({ mermaid });
+      window.mountPromise = window.renderer.mount();
+      window.ready = true;
+    </script>
+  </body>
+</html>
