@@ -16,14 +16,27 @@ function unwrap(mod: unknown): MermaidLike | null {
 }
 
 /**
- * A literal `import(specifier)` is visible to esbuild at build time. That is
- * harmless for the ESM output (mermaid stays external, as configured), but
- * the IIFE build has no module resolver in a plain browser page, and rather
- * than leave an unresolvable bare specifier behind, esbuild bundles the
- * whole dependency into the IIFE instead. Routing the call through
- * `new Function` keeps the specifier a runtime-only string no bundler can
- * see or inline, so this stays a genuine dynamic import in every output
- * format.
+ * True in the ESM build, false in the IIFE build. tsup substitutes this via
+ * esbuild's `define` (see tsup.config.ts), so the bare-import branch below
+ * is a compile-time constant, not a runtime check.
+ *
+ * The bare specifier has to stay a literal `import('mermaid')` for a
+ * bundler consumer (Vite, webpack) to see and resolve it against the copy
+ * of mermaid that consumer installed. But that same literal is exactly
+ * what made esbuild bundle the whole of mermaid into the IIFE build
+ * instead of leaving it external (a plain browser page has no resolver for
+ * a bare specifier, so esbuild pulled the dependency in rather than leave
+ * an unresolvable import behind). Folding this constant to `false` for the
+ * IIFE build lets esbuild dead-code-eliminate the entire branch, literal
+ * import included, so there is nothing left for it to bundle.
+ */
+declare const __DOODLE_BARE_IMPORT__: boolean;
+
+/**
+ * The CDN URL is a runtime string, never a literal, so no bundler can
+ * resolve it at build time regardless of format. Routing it through
+ * `new Function` keeps it that way defensively and stops any bundler from
+ * even attempting static analysis on it.
  */
 const dynamicImport = new Function('specifier', 'return import(specifier)') as (
   specifier: string,
@@ -34,8 +47,9 @@ const dynamicImport = new Function('specifier', 'return import(specifier)') as (
  *
  * Order: an instance the caller passed in, a global the page already loaded
  * (Darby vendors mermaid and loads it first, so it never goes further than
- * this), a bare import for bundler consumers, and only then a CDN URL for
- * plain script-tag pages that have no module resolution at all.
+ * this), a bare import for bundler consumers (ESM build only, see
+ * __DOODLE_BARE_IMPORT__ above), and only then a CDN URL for plain
+ * script-tag pages that have no module resolution at all.
  */
 export async function resolveMermaid(
   provided?: MermaidLike,
@@ -46,10 +60,12 @@ export async function resolveMermaid(
   const global = unwrap((globalThis as { mermaid?: unknown }).mermaid);
   if (global) return global;
 
-  try {
-    return unwrap(await dynamicImport('mermaid'));
-  } catch {
-    // No bare specifier resolution here (IIFE build in a plain page).
+  if (__DOODLE_BARE_IMPORT__) {
+    try {
+      return unwrap(await import('mermaid'));
+    } catch {
+      // No bare specifier resolution here (no mermaid installed).
+    }
   }
 
   if (cdnUrl) {
