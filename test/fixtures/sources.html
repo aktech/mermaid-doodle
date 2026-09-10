@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head><meta charset="utf-8"><title>sources fixture</title></head>
+  <body>
+    <!-- 1. Hugo / Darby and Mermaid's own convention -->
+    <pre class="mermaid" id="plain">graph LR
+  A --> B</pre>
+
+    <!-- 2. Shiki classic structure: real newline text nodes between lines -->
+    <pre class="astro-code" data-language="mermaid" id="shiki"><code><span class="line"><span>graph LR</span></span>
+<span class="line"><span>  A --&gt; B</span></span></code></pre>
+
+    <!-- 3. Expressive Code: div.ec-line per line, no newline text nodes -->
+    <figure class="frame">
+      <pre data-language="mermaid" id="ec"><code><div class="ec-line"><div class="code"><span>graph LR</span></div></div><div class="ec-line"><div class="code"><span>  A --&gt; B</span></div></div></code></pre>
+    </figure>
+
+    <!-- 4. Prism / Rouge / highlight.js -->
+    <pre id="prism"><code class="language-mermaid">graph LR
+  A --&gt; B</code></pre>
+
+    <script type="module">
+      import * as doodle from '/dist/index.js';
+      window.doodle = doodle;
+      window.ready = true;
+    </script>
+  </body>
+</html>
