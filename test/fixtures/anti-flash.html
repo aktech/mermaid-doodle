@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8"><title>anti-flash fixture</title>
+    <link rel="stylesheet" href="/dist/styles.css">
+  </head>
+  <body>
+    <!-- No script at all: this fixture proves the anti-flash behaviour that
+         holds with zero JavaScript, before any renderer could ever run. -->
+    <pre class="mermaid" id="declared">graph LR
+  A["start"] --> B["end"]</pre>
+    <pre data-language="mermaid" id="ambiguous">graph LR
+  A["start"] --> B["end"]</pre>
+  </body>
+</html>

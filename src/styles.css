@@ -4,9 +4,42 @@
   background: none; border: 0; margin: 0 auto; padding: 0;
   font-family: inherit; line-height: normal;
 }
-/* Applied by the renderer to every diagram container it finds, whichever
-   of the four markup shapes it matched, so this hides a Starlight
-   [data-language="mermaid"] block the same way it hides a pre.mermaid one. */
+/*
+ * Anti-flash: hide a diagram until mermaid finishes and marks it
+ * data-processed, so the reader never sees the pre-render state. Two rules,
+ * deliberately, because the four DEFAULT_SELECTOR shapes split into two
+ * different kinds of markup and only one of them is safe to hide with CSS
+ * alone.
+ *
+ * pre.mermaid and div.mermaid are mermaid's own convention: that class
+ * exists to say "render me as a diagram" and nothing else, so an element
+ * carrying it can be hidden from the very first paint, before any
+ * JavaScript has run, with no risk of hiding something that was never
+ * meant to become a diagram. This is a real, unconditional CSS rule.
+ *
+ * [data-language="mermaid"] and code.language-mermaid are different: a
+ * syntax highlighter attaches those to mean "this code block's language is
+ * mermaid", which is equally true of a page that means to show mermaid
+ * source as a plain, permanent code sample with no intention of ever
+ * rendering it. CSS has no way to tell those two cases apart. Hiding this
+ * shape unconditionally would blank a legitimate code sample on any site
+ * that merely loads this stylesheet, and leave it blank forever if the
+ * renderer never runs (not installed, throws, mermaid unavailable). So
+ * these two shapes are hidden only once the renderer has actually claimed
+ * the element, which it signals by adding the doodle-diagram class
+ * (src/renderer.ts) to every container it is about to run mermaid over.
+ * Do not fold this back into one rule: that would either reintroduce a
+ * flash for pre.mermaid or start silently blanking code samples.
+ *
+ * doodle-diagram is added to every container the renderer finds, including
+ * pre.mermaid and div.mermaid ones, so both rules end up matching those
+ * two; that overlap is intentional and harmless.
+ */
+pre.mermaid:not([data-processed]),
+div.mermaid:not([data-processed]) {
+  visibility: hidden;
+  min-height: 2rem;
+}
 .doodle-diagram:not([data-processed]) { visibility: hidden; min-height: 2rem; }
 
 .doodle-source {
