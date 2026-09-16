@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8"><title>render font race fixture</title>
+    <style>:root { --doodle-font: "Test Doodle Font", cursive; }</style>
+  </head>
+  <body>
+    <pre class="mermaid" id="d1">flowchart LR
+  A["start"] --> B["end"]</pre>
+    <script type="module">
+      import mermaid from '/node_modules/mermaid/dist/mermaid.esm.mjs';
+      import * as doodle from '/dist/index.js';
+
+      // Controllable stand-in for document.fonts, matching
+      // render-fonts-load.html: the test resolves this itself, so it can
+      // hold renderOnce() at the font-loading await for as long as it
+      // likes and deterministically land a window "load" event inside
+      // that window, instead of racing a real webfont fetch.
+      let resolveFontLoad;
+      const fontLoadPromise = new Promise((resolve) => { resolveFontLoad = resolve; });
+      Object.defineProperty(document, 'fonts', {
+        configurable: true,
+        value: { ready: Promise.resolve(), load: () => fontLoadPromise },
+      });
+      window.resolveFontLoad = resolveFontLoad;
+
+      window.doodle = doodle;
+      window.renderer = doodle.createRenderer({ mermaid });
+      window.mountPromise = window.renderer.mount();
+      document.body.dataset.ready = 'true';
+    </script>
+  </body>
+</html>

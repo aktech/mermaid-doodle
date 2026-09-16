@@ -158,6 +158,59 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
       return;
     }
 
+    // One getComputedStyle for the whole palette, not one per field. The
+    // declaration it returns is live, so every read below still sees the
+    // current values.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const palette = paletteFromVars((name) => rootStyle.getPropertyValue(name));
+
+    // Mermaid's own colour library cannot parse every colour syntax a site
+    // might write --doodle-* in (oklch(), lab(), color-mix(), ...), so run
+    // the colour fields through a converter first. The converter itself is
+    // created once and reused: it is stateless with respect to any single
+    // palette value, and recreating its backing canvas on every render
+    // would be wasted work.
+    colourConverter ??= createCanvasColourConverter();
+    const colours = normalisePaletteColours(palette, colourConverter);
+
+    // Call initialize() now, before the only await below, and not after it.
+    //
+    // Importing mermaid registers its own `window.addEventListener('load',
+    // ...)` that auto-runs `mermaid.run()` (with no arguments, i.e. over
+    // every element matching the plain ".mermaid" selector, not just ours)
+    // whenever that "load" event fires and mermaid's live config still has
+    // `startOnLoad: true`, which it does until something calls
+    // initialize() with `startOnLoad: false`, as this call does. A
+    // <link rel="stylesheet"> webfont (exactly what --doodle-font asks a
+    // consumer to load) blocks that "load" event, so on a real page the
+    // event can easily land while this function is still awaiting
+    // ensureFontsReady() below. If initialize() has not run yet at that
+    // point, mermaid's own auto-run fires first, over our already-stripped,
+    // not-yet-`data-processed` container, using mermaid's factory default
+    // theme and font (not the palette above), and it marks the container
+    // `data-processed` synchronously, before its own async draw even
+    // starts. Our own explicit run() call below then finds that attribute
+    // already set and silently skips the container, so it is left showing
+    // mermaid's default look with no error and no warning: --doodle-font
+    // (and, for `look: 'classic'`, every other --doodle-* colour) is
+    // silently ignored. Calling initialize() here, synchronously right
+    // after resolving the instance and with nothing awaited in between,
+    // means mermaid's live config already has our theme and
+    // `startOnLoad: false` by the time any "load" event could possibly
+    // land, so its auto-run either never fires or, if it still does,
+    // fires with the correct theme already in place.
+    instance.initialize({
+      startOnLoad: false,
+      securityLevel,
+      look,
+      handDrawnSeed,
+      theme: 'base',
+      fontFamily: palette.font,
+      themeVariables: toThemeVariables(colours),
+      flowchart: { curve: 'basis', padding: 16, htmlLabels: true },
+      ...mermaidConfig,
+    });
+
     const nodes: HTMLElement[] = [];
 
     for (const { container, source } of found) {
@@ -178,34 +231,7 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
       nodes.push(container);
     }
 
-    // One getComputedStyle for the whole palette, not one per field. The
-    // declaration it returns is live, so every read below still sees the
-    // current values.
-    const rootStyle = getComputedStyle(document.documentElement);
-    const palette = paletteFromVars((name) => rootStyle.getPropertyValue(name));
-
     await ensureFontsReady(palette.font);
-
-    // Mermaid's own colour library cannot parse every colour syntax a site
-    // might write --doodle-* in (oklch(), lab(), color-mix(), ...), so run
-    // the colour fields through a converter first. The converter itself is
-    // created once and reused: it is stateless with respect to any single
-    // palette value, and recreating its backing canvas on every render
-    // would be wasted work.
-    colourConverter ??= createCanvasColourConverter();
-    const colours = normalisePaletteColours(palette, colourConverter);
-
-    instance.initialize({
-      startOnLoad: false,
-      securityLevel,
-      look,
-      handDrawnSeed,
-      theme: 'base',
-      fontFamily: palette.font,
-      themeVariables: toThemeVariables(colours),
-      flowchart: { curve: 'basis', padding: 16, htmlLabels: true },
-      ...mermaidConfig,
-    });
 
     await instance.run({ nodes, suppressErrors: true });
   }

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head><meta charset="utf-8"><title>render font default fixture</title></head>
+  <body>
+    <pre class="mermaid" id="d1">flowchart LR
+  A["start"] --> B["end"]</pre>
+    <script type="module">
+      import mermaid from '/node_modules/mermaid/dist/mermaid.esm.mjs';
+      import * as doodle from '/dist/index.js';
+
+      window.doodle = doodle;
+      window.DEFAULT_PALETTE = doodle.DEFAULT_PALETTE;
+      window.renderer = doodle.createRenderer({ mermaid });
+      await window.renderer.mount();
+      document.body.dataset.ready = 'true';
+    </script>
+  </body>
+</html>
