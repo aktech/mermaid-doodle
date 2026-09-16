@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <title>source panel fixture</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@400;600&display=swap"
+    />
+    <link rel="stylesheet" href="/dist/styles.css" />
+    <style>
+      :root {
+        --doodle-font: 'Shantell Sans', cursive;
+        --doodle-accent: #6d28d9;
+        --doodle-node-bg: #efe7ff;
+        --doodle-node-text: #2e1065;
+        --doodle-alt-bg: #f5f0ff;
+        --doodle-alt-border: #c4b5fd;
+        --doodle-cluster-bg: #ffffff;
+        --doodle-cluster-border: #ddd6fe;
+        --doodle-text: #3b0764;
+        --doodle-edge-label-bg: #f7f3ff;
+        --doodle-source-bg: #fbf9ff;
+        --doodle-source-text: #2e1065;
+        --doodle-source-border: #ddd6fe;
+        --doodle-source-keyword: #7c3aed;
+        --doodle-source-string: #15803d;
+        --doodle-source-comment: #8b7aa8;
+        --doodle-source-operator: #0369a1;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #f7f3ff;
+      }
+      #capture {
+        display: inline-block;
+        padding: 40px 48px;
+        background: #f7f3ff;
+      }
+      /* mermaid's own per-render stylesheet hardcodes "trebuchet ms" on
+         .label regardless of the fontFamily/themeVariables.fontFamily
+         passed to initialize(), so force the doodle font here for a
+         legible, deliberate screenshot instead of the library default. */
+      .nodeLabel,
+      .cluster-label,
+      .edgeLabel {
+        font-family: var(--doodle-font) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="capture">
+      <pre class="mermaid" data-doodle-source>flowchart LR
+  Browser["Browser"] --&gt; CDN["CDN"]
+  CDN --&gt; Gateway["API Gateway"]
+  subgraph Services["Services"]
+    Auth["Auth"]
+    Render["Render"]
+  end
+  Gateway --&gt; Auth
+  Gateway --&gt; Render
+  Auth --&gt; DB[("Database")]
+  Render --&gt; DB</pre>
+    </div>
+    <script type="module">
+      import mermaid from '/node_modules/mermaid/dist/mermaid.esm.mjs';
+      import * as doodle from '/dist/index.js';
+
+      window.doodle = doodle;
+      window.renderer = doodle.createRenderer({ mermaid });
+      await window.renderer.mount();
+      document.body.dataset.ready = 'true';
+    </script>
+  </body>
+</html>

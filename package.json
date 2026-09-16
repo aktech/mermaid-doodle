@@ -50,7 +50,8 @@
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "node --test 'src/**/*.test.ts'",
-    "test:dom": "playwright test"
+    "test:dom": "playwright test",
+    "screenshots": "npm run build && node scripts/screenshots.mjs"
   },
   "peerDependencies": {
     "mermaid": ">=11"
