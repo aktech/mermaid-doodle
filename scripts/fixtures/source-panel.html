@@ -37,25 +37,13 @@
       body {
         background: #f7f3ff;
       }
-      #capture {
-        display: inline-block;
-        padding: 40px 48px;
-        background: #f7f3ff;
-      }
-      /* mermaid's own per-render stylesheet hardcodes "trebuchet ms" on
-         .label regardless of the fontFamily/themeVariables.fontFamily
-         passed to initialize(), so force the doodle font here for a
-         legible, deliberate screenshot instead of the library default. */
-      .nodeLabel,
-      .cluster-label,
-      .edgeLabel {
-        font-family: var(--doodle-font) !important;
-      }
+      /* The screenshot script crops to the rendered wrapper's own measured
+         bounding box plus a fixed margin, not to this wrapper, so no
+         padding is needed here: it would just be extra, uncropped space. */
     </style>
   </head>
   <body>
-    <div id="capture">
-      <pre class="mermaid" data-doodle-source>flowchart LR
+    <pre class="mermaid" data-doodle-source>flowchart LR
   Browser["Browser"] --&gt; CDN["CDN"]
   CDN --&gt; Gateway["API Gateway"]
   subgraph Services["Services"]
@@ -66,7 +54,6 @@
   Gateway --&gt; Render
   Auth --&gt; DB[("Database")]
   Render --&gt; DB</pre>
-    </div>
     <script type="module">
       import mermaid from '/node_modules/mermaid/dist/mermaid.esm.mjs';
       import * as doodle from '/dist/index.js';

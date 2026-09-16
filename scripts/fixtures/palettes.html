@@ -21,9 +21,12 @@
     </style>
   </head>
   <body>
+    <!-- Generous starting size so nothing clips before the capture script
+         measures each panel's actual rendered content and shrinks these
+         to fit it plus a fixed margin. -->
     <div id="row">
-      <iframe id="a" src="/scripts/fixtures/palette-violet.html" width="380" height="320"></iframe>
-      <iframe id="b" src="/scripts/fixtures/palette-amber.html" width="380" height="320"></iframe>
+      <iframe id="a" src="/scripts/fixtures/palette-violet.html" width="600" height="500"></iframe>
+      <iframe id="b" src="/scripts/fixtures/palette-amber.html" width="600" height="500"></iframe>
     </div>
   </body>
 </html>
