@@ -48,6 +48,8 @@
   ],
   "scripts": {
     "build": "tsup",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run typecheck && npm test",
     "typecheck": "tsc --noEmit",
     "test": "node --test 'src/**/*.test.ts'",
     "test:dom": "playwright test",
