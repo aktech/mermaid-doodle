@@ -2,9 +2,9 @@
 
 Hand-drawn Mermaid diagrams for any static site, themed from CSS custom properties, with no JavaScript configuration.
 
-<img src="docs/media/hero-light.png" alt="A flowchart (browser to CDN to API gateway to an Auth and Render service to a database) drawn in mermaid-doodle's hand-drawn style under a light violet site theme" width="440"> <img src="docs/media/hero-dark.png" alt="The same flowchart rendered under a dark theme, following the page's --doodle-* variables with no code change" width="440">
+<img src="https://raw.githubusercontent.com/aktech/mermaid-doodle/main/docs/media/hero-light.png" alt="A flowchart (browser to CDN to API gateway to an Auth and Render service to a database) drawn in mermaid-doodle's hand-drawn style under a light violet site theme" width="440"> <img src="https://raw.githubusercontent.com/aktech/mermaid-doodle/main/docs/media/hero-dark.png" alt="The same flowchart rendered under a dark theme, following the page's --doodle-* variables with no code change" width="440">
 
-<img src="docs/media/palettes.png" alt="The same diagram rendered on two different sites, one violet and one amber, each keeping its own background and accent colours" width="760">
+<img src="https://raw.githubusercontent.com/aktech/mermaid-doodle/main/docs/media/palettes.png" alt="The same diagram rendered on two different sites, one violet and one amber, each keeping its own background and accent colours" width="760">
 
 ## Install
 
@@ -76,7 +76,7 @@ Theme is `data-theme="light"|"dark"` on the root element, then a `dark` class, t
 
 Add `data-doodle-source` to a diagram or its wrapper for a copyable, highlighted source panel above it, or set `showSource: true` for every diagram.
 
-<img src="docs/media/source-panel.png" alt="A highlighted, copyable mermaid source panel with a copy button, shown above the diagram it renders" width="760">
+<img src="https://raw.githubusercontent.com/aktech/mermaid-doodle/main/docs/media/source-panel.png" alt="A highlighted, copyable mermaid source panel with a copy button, shown above the diagram it renders" width="760">
 
 Rendering also sets `data-doodle-src` on every container it collects, since the container's content is replaced with an SVG and the source text would otherwise be lost by the next render. This puts the diagram source into the DOM as an attribute value, where anything reading the page can see it.
 
