@@ -1,6 +1,17 @@
 # mermaid-doodle
 
+[![CI](https://github.com/aktech/mermaid-doodle/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/aktech/mermaid-doodle/actions/workflows/ci.yml)
+[![Publish](https://github.com/aktech/mermaid-doodle/actions/workflows/publish.yml/badge.svg)](https://github.com/aktech/mermaid-doodle/actions/workflows/publish.yml)
+
 Hand-drawn Mermaid diagrams for any static site, themed from CSS custom properties, with no JavaScript configuration.
+
+mermaid-doodle finds the Mermaid code blocks already on your page (Hugo, Astro, Starlight, Jekyll, or plain HTML), renders them in Mermaid's hand-drawn style, and colours them from `--doodle-*` CSS variables you set in your own stylesheet. Switch your site to dark mode and the diagrams re-render to match. Change your brand colours and the diagrams follow, with no per-diagram config.
+
+- Picks up the markup common site generators and syntax highlighters already emit
+- Colours from CSS variables, including `oklch()`, `lab()` and `color-mix()`
+- Follows light/dark switches via `data-theme`, a `dark` class, or `prefers-color-scheme`
+- Optional copyable, syntax-highlighted source panel above each diagram
+- Mermaid is never bundled: use your own copy, or it loads a pinned version from a CDN
 
 <img src="https://raw.githubusercontent.com/aktech/mermaid-doodle/main/docs/media/hero-light.png" alt="A flowchart (browser to CDN to API gateway to an Auth and Render service to a database) drawn in mermaid-doodle's hand-drawn style under a light violet site theme" width="440"> <img src="https://raw.githubusercontent.com/aktech/mermaid-doodle/main/docs/media/hero-dark.png" alt="The same flowchart rendered under a dark theme, following the page's --doodle-* variables with no code change" width="440">
 
