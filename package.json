@@ -1,6 +1,6 @@
 {
   "name": "mermaid-doodle",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Hand-drawn Mermaid diagrams for any static site, themed from CSS custom properties.",
   "license": "MIT",
   "author": "Amit Kumar",
