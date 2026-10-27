@@ -101,11 +101,14 @@ createRenderer({
   cdnUrl: 'https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.esm.min.mjs', // pinned; null refuses it
   look: 'handDrawn',       // or 'classic'
   handDrawnSeed: 4,
+  solidFill: true,         // handDrawn node fills painted solid; false keeps mermaid's hatching
   securityLevel: 'strict',
   showSource: false,
   mermaidConfig: {},       // merged last, overrides everything above
 });
 ```
+
+In the handDrawn look mermaid hatches node fills with spaced strokes, which breaks up label text on a strong `style X fill:...` colour. `solidFill` (on by default) widens those strokes until they overlap, so fills read as solid and the outline stays hand-drawn.
 
 `mount()` renders and follows theme changes; `destroy()` stops that; `render()` is one-shot. Mermaid is never bundled: it resolves from an instance you pass in, then `window.mermaid`, then a bare `import('mermaid')`, then the CDN URL above (`cdnUrl: null` refuses it).
 

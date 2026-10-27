@@ -5,6 +5,7 @@ import { watchTheme } from './theme.ts';
 import { resolveMermaid, DEFAULT_CDN_URL, type MermaidLike } from './mermaid-loader.ts';
 import { normalisePaletteColours, type ColourConverter } from './colour.ts';
 import { createCanvasColourConverter } from './colour-canvas.ts';
+import { solidifyNodeFills } from './solid-fill.ts';
 
 export interface DoodleOptions {
   /** Where to look for diagrams. Defaults to the whole document. */
@@ -17,6 +18,8 @@ export interface DoodleOptions {
   cdnUrl?: string | null;
   look?: 'handDrawn' | 'classic';
   handDrawnSeed?: number;
+  /** Paint handDrawn node fills solid instead of mermaid's hatching. Defaults to true. */
+  solidFill?: boolean;
   securityLevel?: 'strict' | 'loose' | 'antiscript' | 'sandbox';
   /** Show the source panel for every diagram, not just opted-in ones. */
   showSource?: boolean;
@@ -70,6 +73,7 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
     cdnUrl = DEFAULT_CDN_URL,
     look = 'handDrawn',
     handDrawnSeed = 4,
+    solidFill = true,
     securityLevel = 'strict',
     showSource = false,
     mermaidConfig = {},
@@ -234,6 +238,7 @@ export function createRenderer(options: DoodleOptions = {}): DoodleRenderer {
     await ensureFontsReady(palette.font);
 
     await instance.run({ nodes, suppressErrors: true });
+    if (look === 'handDrawn' && solidFill) for (const node of nodes) solidifyNodeFills(node);
   }
 
   /**

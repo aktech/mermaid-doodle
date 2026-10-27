@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8"><title>solid fill fixture</title>
+    <link rel="stylesheet" href="/dist/styles.css">
+    <style>body { background: #ffffff; margin: 0; padding: 24px; }</style>
+  </head>
+  <body>
+    <pre class="mermaid" id="d1">graph LR
+  A["a"] --> B["b"]
+  style A fill:#059669,color:#fff</pre>
+    <script type="module">
+      import mermaid from '/node_modules/mermaid/dist/mermaid.esm.mjs';
+      import * as doodle from '/dist/index.js';
+      const hachure = new URLSearchParams(location.search).has('hachure');
+      window.renderer = doodle.createRenderer(hachure ? { mermaid, solidFill: false } : { mermaid });
+      await window.renderer.mount();
+      window.ready = true;
+    </script>
+  </body>
+</html>
