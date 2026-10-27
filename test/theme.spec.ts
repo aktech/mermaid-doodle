@@ -68,3 +68,16 @@ test('an operating system theme change notifies watchers, and unsubscribing stop
   await page.waitForTimeout(100);
   expect(await eventsOf(page)).toEqual(['dark']);
 });
+
+test('a light class on the root outranks a dark operating system', async ({ page }) => {
+  // Sites that toggle between "light" and "dark" classes: with the OS in dark
+  // mode, switching the page to light must notify watchers so diagrams redraw.
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.evaluate(() => {
+    document.documentElement.removeAttribute('data-theme');
+    document.documentElement.classList.add('dark');
+  });
+  await page.evaluate(() => document.documentElement.classList.replace('dark', 'light'));
+  expect(await themeOf(page)).toBe('light');
+  await expect.poll(() => eventsOf(page)).toEqual(['dark', 'light']);
+});

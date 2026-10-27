@@ -4,13 +4,14 @@ const DARK_QUERY = '(prefers-color-scheme: dark)';
 
 /**
  * Resolve the page's current theme. Attribute first (both target sites set
- * data-theme on <html>), then a "dark" class, then the OS preference.
+ * data-theme on <html>), then a "dark" or "light" class, then the OS preference.
  */
 export function currentTheme(doc: Document = document): ThemeName {
   const root = doc.documentElement;
   const attr = root.getAttribute('data-theme');
   if (attr === 'dark' || attr === 'light') return attr;
   if (root.classList.contains('dark')) return 'dark';
+  if (root.classList.contains('light')) return 'light';
   const view = doc.defaultView;
   if (view?.matchMedia(DARK_QUERY).matches) return 'dark';
   return 'light';

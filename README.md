@@ -9,7 +9,7 @@ mermaid-doodle finds the Mermaid code blocks already on your page (Hugo, Astro, 
 
 - Picks up the markup common site generators and syntax highlighters already emit
 - Colours from CSS variables, including `oklch()`, `lab()` and `color-mix()`
-- Follows light/dark switches via `data-theme`, a `dark` class, or `prefers-color-scheme`
+- Follows light/dark switches via `data-theme`, a `dark` or `light` class, or `prefers-color-scheme`
 - Optional copyable, syntax-highlighted source panel above each diagram
 - Mermaid is never bundled: use your own copy, or it loads a pinned version from a CDN
 
@@ -81,7 +81,7 @@ The source panel below has its own separate palette:
 | `--doodle-source-border` | Panel border, header rule, copy button border | `#d4d4d8` |
 | `--doodle-source-keyword` / `-string` / `-comment` / `-operator` | Highlighted keyword / string / comment / operator | `#7c3aed` / `#15803d` / `#71717a` / `#0369a1` |
 
-Theme is `data-theme="light"|"dark"` on the root element, then a `dark` class, then `prefers-color-scheme`. `mount()` re-renders on any of those changing; renders are serialised, so two quick theme changes always leave the diagram in the theme asked for last.
+Theme is `data-theme="light"|"dark"` on the root element, then a `dark` or `light` class, then `prefers-color-scheme`. `mount()` re-renders on any of those changing; renders are serialised, so two quick theme changes always leave the diagram in the theme asked for last.
 
 ## Showing the source
 
